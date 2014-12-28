@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import codecs
 import setuptools
 import sys
@@ -9,7 +10,14 @@ with codecs.open('README.rst', 'rb', encoding='utf-8') as file_obj:
     long_description = '\n' + file_obj.read()
 
 install_requirements = []
-test_requirements = ['nose>1.3,<2']
+test_requirements = []
+
+with open('test-requirements.txt', 'r') as file_obj:
+    test_requirements.extend(
+        line.strip() for line in file_obj
+        if not line.startswith('#')
+    )
+
 if sys.version_info < (3, ):
     test_requirements.append('mock>1.0,<2')
 
@@ -38,6 +46,10 @@ setuptools.setup(
     ],
     entry_points={
         'distutils.commands': [
+            'git_version = setupext.gitversion:GitVersion',
         ],
+    },
+    cmdclass={
+        'git_version': gitversion.GitVersion,
     },
 )
