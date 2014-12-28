@@ -3,4 +3,4 @@
 .. toctree::
    :hidden:
 
-.. include:: ../HISTORY   
+.. include:: ../HISTORY
