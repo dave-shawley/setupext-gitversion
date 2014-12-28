@@ -46,6 +46,10 @@ setuptools.setup(
     ],
     entry_points={
         'distutils.commands': [
+            'git_version = setupext.gitversion:GitVersion',
         ],
+    },
+    cmdclass={
+        'git_version': gitversion.GitVersion,
     },
 )
