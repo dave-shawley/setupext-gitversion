@@ -12,6 +12,12 @@ with codecs.open('README.rst', 'rb', encoding='utf-8') as file_obj:
 install_requirements = []
 test_requirements = []
 
+with open('requirements.txt', 'r') as file_obj:
+    install_requirements.extend(
+        line.strip() for line in file_obj
+        if not line.startswith('#')
+    )
+
 with open('test-requirements.txt', 'r') as file_obj:
     test_requirements.extend(
         line.strip() for line in file_obj
