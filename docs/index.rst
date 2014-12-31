@@ -4,6 +4,7 @@ Documentation
 =============
 .. toctree::
 
+   versioning
    hacking
 
 .. include:: ../HISTORY
