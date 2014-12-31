@@ -1,7 +1,12 @@
 from distutils import cmd, log
 import subprocess
 
-import packaging.version
+# This makes it possible to import from setup.py and
+# get __version__ without having packaging installed
+try:
+    import packaging.version
+except ImportError:
+    pass
 
 
 version_info = (0, 0, 0)
