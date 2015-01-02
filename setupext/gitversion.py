@@ -27,42 +27,33 @@ class GitVersion(cmd.Command):
 
     def run(self):
         version = packaging.version.parse(self.distribution.metadata.version)
+        public_version, _ = _partition_version(version.public.split('.'))
+        starting_rev = public_version
 
-        version_info = {'release': []}
-        segments = version.public.split('.')
-        while segments:
-            try:
-                version_info['release'].append(int(segments[0]))
-                segments.pop(0)
-            except ValueError:
-                break
-        version_info['release'] = '.'.join(
-            str(v) for v in version_info['release'])
+        local_version = []
+        lines = self._run_git('rev-list', '--merges',
+                              '{0}...HEAD'.format(starting_rev))
+        self.debug('found {0} merges since tag {1}', len(lines), starting_rev)
+        if lines:
+            local_version.append('post{0}'.format(len(lines)))
+            starting_rev = lines[0]
 
-        rev_spec = '{0}...HEAD'.format(version_info['release'])
+        lines = self._run_git('rev-list', '--first-parent',
+                              '{0}...HEAD'.format(starting_rev))
+        self.debug('found {0} commits since {1}', len(lines), starting_rev)
+        if lines:
+            local_version.append('dev{0}'.format(len(lines)))
 
-        lines = self._run_git('rev-list', '--merges', rev_spec)
-        self.debug('found {0} merges since tag {1}',
-                   len(lines), version_info['release'])
-        version_info['post'] = len(lines)
-
-        try:
-            rev_spec = '{0}...HEAD'.format(lines.pop(0))
-        except IndexError:
-            pass
-        lines = self._run_git('rev-list', '--first-parent', rev_spec)
-        version_info['dev'] = len(lines)
-
-        local_version = '.post{0[post]}.dev{0[dev]}'.format(version_info)
-        version = ''.join([version_info['release'], local_version])
-        self.info('setting version to {0}', version)
-        self.distribution.metadata.version = version
+        local_version = '.'.join(local_version)
+        full_version = '.'.join([public_version, local_version])
+        self.info('setting version to {0}', full_version)
+        self.distribution.metadata.version = full_version
 
         if self.version_file is not None:
             self.debug('writing local version {0} to {1}',
                        local_version, self.version_file)
             if not self.dry_run:
-                file_util.write_file(self.version_file, [local_version])
+                file_util.write_file(self.version_file, ['.' + local_version])
 
     def info(self, message, *args):
         self.announce(message.format(*args), level=log.INFO)
@@ -94,3 +85,15 @@ def _run_command(git_program, *args):
         raise subprocess.CalledProcessError(pipe.returncode,
                                             ' '.join(exec_list))
     return stdout, stderr
+
+
+def _partition_version(segments):
+    """Partition a version list into public and local parts."""
+    needle = len(segments)
+    for index, segment in enumerate(segments):
+        try:
+            int(segment)
+        except ValueError:
+            needle = index
+            break
+    return '.'.join(segments[:needle]), '.'.join(segments[needle:])
