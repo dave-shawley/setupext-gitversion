@@ -44,8 +44,10 @@ class GitVersion(cmd.Command):
         if lines:
             local_version.append('dev{0}'.format(len(lines)))
 
-        local_version = '.'.join(local_version)
-        full_version = '.'.join([public_version, local_version])
+        full_version = public_version
+        if local_version:
+            local_version = '.'.join(local_version)
+            full_version += '.{0}'.format(local_version)
         self.info('setting version to {0}', full_version)
         self.distribution.metadata.version = full_version
 

@@ -138,6 +138,10 @@ class WhenGeneratingVersionFile(CommandTestCase):
         command.version_file = cls.version_file
         command.run()
 
+    def test_that_version_is_set_correctly(self):
+        self.assertEqual(
+            self.distribution.metadata.version, '1.2.3.post1.dev2')
+
     def test_that_version_file_was_created(self):
         self.assertTrue(os.path.exists(self.version_file))
 
@@ -172,6 +176,9 @@ class WhenGeneratingVersionFileFromReleaseVersion(CommandTestCase):
     def execute(cls, command):
         command.version_file = cls.version_file
         command.run()
+
+    def test_that_version_is_set_correctly(self):
+        self.assertEqual(self.distribution.metadata.version, '1.2.3')
 
     def test_that_version_file_is_empty(self):
         with open(self.version_file) as version_file:
