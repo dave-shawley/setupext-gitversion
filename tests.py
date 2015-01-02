@@ -147,3 +147,32 @@ class WhenGeneratingVersionFile(CommandTestCase):
                 version_file.readlines(),
                 ['.post1.dev2\n'],
             )
+
+
+class WhenGeneratingVersionFileFromReleaseVersion(CommandTestCase):
+    @classmethod
+    def configure(cls, git_cmd):
+        git_cmd.add_return_value(
+            ('', ''),
+            'git', 'rev-list', '--merges', '1.2.3...HEAD',
+        )
+        git_cmd.add_return_value(
+            ('', ''),
+            'git', 'rev-list', '--first-parent', '1.2.3...HEAD',
+        )
+        cls._tmp_dir = tempfile.mkdtemp()
+        cls.version_file = os.path.join(cls._tmp_dir, 'VERSION-INFO')
+
+    @classmethod
+    def tearDownClass(cls):
+        super(WhenGeneratingVersionFileFromReleaseVersion, cls).tearDownClass()
+        shutil.rmtree(cls._tmp_dir)
+
+    @classmethod
+    def execute(cls, command):
+        command.version_file = cls.version_file
+        command.run()
+
+    def test_that_version_file_is_empty(self):
+        with open(self.version_file) as version_file:
+            self.assertEqual(version_file.readlines(), [])

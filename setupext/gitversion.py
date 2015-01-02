@@ -16,7 +16,7 @@ __version__ = '.'.join(str(v) for v in version_info)
 class GitVersion(cmd.Command):
     description = 'Generate version numbers based on git'
     user_options = [
-        ('version-file', 'V', 'write the generated version to this file'),
+        ('version-file=', 'V', 'write the generated version to this file'),
     ]
 
     def initialize_options(self):
@@ -50,10 +50,13 @@ class GitVersion(cmd.Command):
         self.distribution.metadata.version = full_version
 
         if self.version_file is not None:
+            version_lines = []
+            if local_version:
+                version_lines.append('.' + local_version)
             self.debug('writing local version {0} to {1}',
                        local_version, self.version_file)
             if not self.dry_run:
-                file_util.write_file(self.version_file, ['.' + local_version])
+                file_util.write_file(self.version_file, version_lines)
 
     def info(self, message, *args):
         self.announce(message.format(*args), level=log.INFO)
