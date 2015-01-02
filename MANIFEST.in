@@ -1,6 +1,7 @@
 include HACKING
 include HISTORY
 include LICENSE
+include LOCAL-VERSION
 include .coveragerc
 include *requirements.txt
 include tox.ini

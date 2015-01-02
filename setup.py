@@ -6,6 +6,13 @@ import sys
 from setupext import gitversion
 
 
+local_id = ''
+try:
+    with open('LOCAL-VERSION', 'r') as version_file:
+        local_id = version_file.readline().strip()
+except IOError:
+    pass
+
 with codecs.open('README.rst', 'rb', encoding='utf-8') as file_obj:
     long_description = '\n' + file_obj.read()
 
@@ -30,7 +37,7 @@ if sys.version_info < (3, ):
 
 setuptools.setup(
     name='setupext-gitversion',
-    version=gitversion.__version__,
+    version=gitversion.__version__ + local_id,
     author='Dave Shawley',
     author_email='daveshawley@gmail.com',
     url='http://github.com/dave-shawley/setupext-gitversion',
