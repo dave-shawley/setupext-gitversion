@@ -1,4 +1,4 @@
-from distutils import cmd, log
+from distutils import cmd, file_util, log
 import subprocess
 
 # This makes it possible to import from setup.py and
@@ -15,10 +15,12 @@ __version__ = '.'.join(str(v) for v in version_info)
 
 class GitVersion(cmd.Command):
     description = 'Generate version numbers based on git'
-    user_options = []
+    user_options = [
+        ('version-file', 'V', 'write the generated version to this file'),
+    ]
 
     def initialize_options(self):
-        pass
+        self.version_file = None
 
     def finalize_options(self):
         pass
@@ -51,13 +53,16 @@ class GitVersion(cmd.Command):
         lines = self._run_git('rev-list', '--first-parent', rev_spec)
         version_info['dev'] = len(lines)
 
-        version = '{0}.post{1}.dev{2}'.format(
-            version_info['release'],
-            version_info['post'],
-            version_info['dev'],
-        )
+        local_version = '.post{0[post]}.dev{0[dev]}'.format(version_info)
+        version = ''.join([version_info['release'], local_version])
         self.info('setting version to {0}', version)
         self.distribution.metadata.version = version
+
+        if self.version_file is not None:
+            self.debug('writing local version {0} to {1}',
+                       local_version, self.version_file)
+            if not self.dry_run:
+                file_util.write_file(self.version_file, [local_version])
 
     def info(self, message, *args):
         self.announce(message.format(*args), level=log.INFO)

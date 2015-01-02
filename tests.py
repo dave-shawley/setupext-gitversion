@@ -1,4 +1,7 @@
 from distutils import dist
+import os.path
+import shutil
+import tempfile
 import unittest
 
 try:
@@ -58,27 +61,45 @@ class WhenInitializingOptions(unittest.TestCase):
             self.assertNotEqual(attr_value, UNSPECIFIED)
 
 
-class WhenRunningCommand(unittest.TestCase):
+class CommandTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(WhenRunningCommand, cls).setUpClass()
+        super(CommandTestCase, cls).setUpClass()
         cls.distribution = dist.Distribution(attrs={'version': '1.2.3'})
         cls.run_git_command = ProgrammableCallable()
-        cls.run_git_command.add_return_value(
+        cls.configure(cls.run_git_command)
+
+        with mock.patch('setupext.gitversion._run_command',
+                        new=cls.run_git_command):
+            command = gitversion.GitVersion(cls.distribution)
+            command.initialize_options()
+            cls.execute(command)
+
+    @classmethod
+    def configure(cls, git_cmd):
+        raise NotImplementedError
+
+    @classmethod
+    def execute(cls, command):
+        raise NotImplementedError
+
+
+class WhenRunningCommand(CommandTestCase):
+    @classmethod
+    def configure(cls, git_cmd):
+        git_cmd.add_return_value(
             ('second merge\nfirst merge\n', ''),
             'git', 'rev-list', '--merges', '1.2.3...HEAD',
         )
-        cls.run_git_command.add_return_value(
+        git_cmd.add_return_value(
             ('third commit\nsecond commit\nfirst commit\n', ''),
             'git', 'rev-list', '--first-parent', 'second merge...HEAD',
         )
 
-        with mock.patch('setupext.gitversion._run_command',
-                        new=cls.run_git_command):
-            cls.command = gitversion.GitVersion(cls.distribution)
-            cls.command.initialize_options()
-            cls.command.run()
+    @classmethod
+    def execute(cls, command):
+        command.run()
 
     def test_that_git_is_called_for_merges(self):
         self.run_git_command.assert_called(
@@ -90,4 +111,39 @@ class WhenRunningCommand(unittest.TestCase):
 
     def test_that_version_is_set_correctly(self):
         self.assertEqual(
-            self.command.distribution.metadata.version, '1.2.3.post2.dev3')
+            self.distribution.metadata.version, '1.2.3.post2.dev3')
+
+
+class WhenGeneratingVersionFile(CommandTestCase):
+    @classmethod
+    def configure(cls, git_cmd):
+        git_cmd.add_return_value(
+            ('1\n', ''),
+            'git', 'rev-list', '--merges', '1.2.3...HEAD',
+        )
+        git_cmd.add_return_value(
+            ('1.2\n1.1\n', ''),
+            'git', 'rev-list', '--first-parent', '1...HEAD',
+        )
+        cls._tmp_dir = tempfile.mkdtemp()
+        cls.version_file = os.path.join(cls._tmp_dir, 'VERSION-INFO')
+
+    @classmethod
+    def tearDownClass(cls):
+        super(WhenGeneratingVersionFile, cls).tearDownClass()
+        shutil.rmtree(cls._tmp_dir)
+
+    @classmethod
+    def execute(cls, command):
+        command.version_file = cls.version_file
+        command.run()
+
+    def test_that_version_file_was_created(self):
+        self.assertTrue(os.path.exists(self.version_file))
+
+    def test_that_version_file_contains_local_version(self):
+        with open(self.version_file) as version_file:
+            self.assertEqual(
+                version_file.readlines(),
+                ['.post1.dev2\n'],
+            )
