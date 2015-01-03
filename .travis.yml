@@ -7,7 +7,7 @@ python:
   - 'pypy'
 sudo: false
 install:
-  - pip install -q -r test-requirements.txt -r requirements.txt --download-cache $OMHE/.cache/pip
+  - pip install -q -r test-requirements.txt -r requirements.txt --download-cache $HOME/.cache/pip
 script:
   - nosetests
 cache:
