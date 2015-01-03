@@ -8,6 +8,7 @@ python:
 sudo: false
 install:
   - pip install -q -r test-requirements.txt -r requirements.txt --download-cache $HOME/.cache/pip
+  - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install unittest2; fi
 script:
   - nosetests
 cache:
