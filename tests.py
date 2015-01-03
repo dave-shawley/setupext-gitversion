@@ -202,3 +202,68 @@ class WhenRunningInDryRunMode(CommandTestCase):
 
     def test_that_version_file_is_not_created(self):
         self.assertFalse(os.path.exists(self.version_file))
+
+
+class _RunCommandTestCase(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super(_RunCommandTestCase, cls).setUpClass()
+        with mock.patch('setupext.gitversion.subprocess') as subprocess:
+            cls.subprocess_module = subprocess
+            subprocess.CalledProcessError = Exception
+            cls.configure(subprocess.Popen)
+            try:
+                cls.execute()
+            except subprocess.CalledProcessError as exc:
+                cls.exception = exc
+
+    @classmethod
+    def configure(cls, popen):
+        cls.exception = None
+        cls.popen = popen
+        cls.pipe = cls.popen.return_value
+        cls.pipe.communicate.return_value = (
+            mock.sentinel.out, mock.sentinel.err)
+
+    @classmethod
+    def execute(cls):
+        cls.returned = gitversion._run_command(
+            mock.sentinel.git, mock.sentinel.arg1, mock.sentinel.arg2)
+
+    def test_that_pipe_is_opened_to_correct_command(self):
+        self.popen.assert_called_once_with(
+            [mock.sentinel.git, mock.sentinel.arg1, mock.sentinel.arg2],
+            close_fds=True, universal_newlines=True,
+            stdout=self.subprocess_module.PIPE,
+            stderr=self.subprocess_module.PIPE,
+        )
+
+
+class WhenInternallyRunningCommand(_RunCommandTestCase):
+
+    @classmethod
+    def configure(cls, popen):
+        super(WhenInternallyRunningCommand, cls).configure(popen)
+        cls.pipe.returncode = 0
+
+    def test_that_pipe_communication_invoked(self):
+        self.pipe.communicate.assert_called_once_with()
+
+    def test_that_no_exception_is_raised(self):
+        self.assertIsNone(self.exception)
+
+    def test_that_output_is_returned(self):
+        self.assertEqual(self.returned, self.pipe.communicate.return_value)
+
+
+class WhenInternallyRunningCommandThatFails(_RunCommandTestCase):
+
+    @classmethod
+    def configure(cls, popen):
+        super(WhenInternallyRunningCommandThatFails, cls).configure(popen)
+        cls.pipe.returncode = 2
+
+    def test_that_called_process_error_is_raised(self):
+        self.assertIsInstance(
+            self.exception, self.subprocess_module.CalledProcessError)
