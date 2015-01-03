@@ -32,6 +32,10 @@ should use the version attribute to calculate the value passed to as the
       # ...
    )
 
+This extension searches for a git tag matching the public portion of the
+``version`` keyword and uses it as the basis for constructing the post and
+development release segements.
+
 Pre Release Segment
 -------------------
 This extension does not define a value for the pre-release segment.

@@ -4,6 +4,7 @@ Documentation
 =============
 .. toctree::
 
+   usage
    versioning
    hacking
 

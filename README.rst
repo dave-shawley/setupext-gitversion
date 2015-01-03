@@ -30,77 +30,69 @@ stage pre-release packages and builds from a CI server in an internal index.
 This is where this extension comes into play.  It provides a consistent way
 to manage package versions throughout all stages of development.
 
+Let's look at the state of this project as I am writing this document.  The
+git history looks like the following::
+
+   * 3fdc192 - (HEAD, origin/initial-implementation, initial-implementation)
+   ###### 9 more commits here
+   * 7ca1fd2 - (origin/master, master)
+   *   87d944e - Merge pull request #1 from dave-shawley/reorg (6 days ago)
+   |\
+   | * 04d0cca - (origin/reorg, reorg)
+   | ###### 9 more commits here
+   |/
+   * bd7ad3c - (tag: 0.0.0) SYN (4 months ago)
+
+When I run **setup.py git_version** it sets the version to ``0.0.0.post1.dev11``.
+The ``0.0.0`` portion is the release segment that is passed to the ``setup``
+function in *setup.py*.   The extension finds that tag in the history and
+counts the number of merges that have occurred since that tag -- this value
+becomes the *post* version segment.  In this case there has only been a single
+merge.  Then it counts the number of commits since the last merge occurred --
+this value becomes the *development* version segment.
+
 How?
 ----
 The easiest way to use this extension is to install it into your build
 environment and then use it from the command line when you generate and upload
-your distribution.  It will generate the appropriate version segments and
-update the package metadata appropriately.  That only solves half of the
-problem -- the package name and embedded distribution metadata (as used by
-the Python packaging tools) are re-written.  This means that:
+your distribution.
 
-1. *pip* will show the correct version
-2. the package version retrieved from `pkg_resources`_ will be correct
+1. ``pip install setupext-gitversion`` into your build environment
+2. Add the following lines to your *setup.cfg*::
 
-What this extension does not do is magically provide a mechanism to update
-a ``__version__`` attribute within your package or anything like that.  It
-will write the generated version to a file that you can include in your
-distribution though.  The recommended approach is to write your *setup.py*
-to do this::
+     [git_version]
+     version-file = LOCAL-VERSION
 
-   import setuptools
-   import mypackage
+3. Add the following line to your *MANIFEST.in*::
 
-   try:
-      with open('LOCAL-VERSION') as version_file:
-         local_id = version_file.readline().strip()
-   except IOError:
-      local_id = ''
+      include LOCAL-VERSION
 
-   setuptools.setup(
-      name='mypackage',
-      version=mypackage.__version__ + local_id,
-      # all the other stuff
-   )
+4. Modify your *setup.py* to append the contents of *LOCAL-VERSION*
+   to your ``version`` keyword::
 
-You will also need to add ``include LOCAL-VERSION`` to your *MANIFEST.in* to
-ensure that it is included in your distribution file.  If you need access to
-the full version information, then you can embed the version file as package
-data and look it up using ``pkgutil.get_data`` to build ``__version__``::
+      version_suffix = ''
+      try:
+         with open('LOCAL-VERSION') as f:
+            version_suffix = f.readline().strip()
+      except IOError:
+         pass
 
-   # mypackage.__init__
-   import pkgutil
+      setup(
+         # normal keywords
+         version='1.2.3' + version_suffix,
+      )
 
-   version_info = [1, 2, 3]
-   __version__ = '.'.join(str(v) for v in version_info)
-   try:
-      with pkgutil.get_data(__name__, 'VERSION') as file_obj:
-         suffix += file_obj.readline().strip()
-      __version__ += suffix
-      version_info.extend(suffix.replace('+', '.').split('.'))
-   except IOError:
-      pass
+   Where ``1.2.3`` is the tag of the last release package.
 
-This approach will give you programmatic access to the full version information
-from outside of your module.  If you do need such access, you are probably
-much better off using the facilities provided by `pkg_resources`_::
+5. Add ``git_version`` to your *upload* or distribution generation
+   command.  You want to use something like the following::
 
-   # mypackage.__init__
-   version_info = (1, 2, 3)
-   __version__ = '.'.join(str(v) for v in version_info)
+      setup.py git_version sdist upload
+      setup.py git_version bdist_egg upload
 
-   # package that needs version information
-   try:
-      import pkg_resources
-      dist = pkg_resources.get_distribution('mypackage')
-      version = dist.version
-   except ImportError:
-      import mypackage
-      version = mypackage.__version__
-
-There are many different ways to embed additional version information in
-your package.  This extension will generate non-release version information
-deterministically from git.  It is up to you to make use of it.
+And that's it.  That will embed SCM information into your package when
+your build a distribution.  It is also smart enough to generate an empty
+suffix for a build from a tagged commit.
 
 Ok... Where?
 ------------
