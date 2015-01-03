@@ -31,6 +31,8 @@ with open('test-requirements.txt', 'r') as file_obj:
         if not line.startswith('#')
     )
 
+if sys.version_info < (2, 7):
+    test_requirements.append('unittest2')
 if sys.version_info < (3, ):
     test_requirements.append('mock>1.0,<2')
 
@@ -54,8 +56,16 @@ setuptools.setup(
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: Implementation :: CPython',
+        'Programming Language :: Python :: Implementation :: PyPy',
         'Framework :: Setuptools Plugin',
-        'Development Status :: 1 - Planning',
+        'Development Status :: 4 - Beta',
     ],
     entry_points={
         'distutils.commands': [
