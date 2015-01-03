@@ -1,0 +1,25 @@
+language: python
+python:
+  - '2.6'
+  - '2.7'
+  - '3.3'
+  - '3.4'
+  - 'pypy'
+sudo: false
+install:
+  - pip install -q -r test-requirements -r requirements.txt --download-cache $OMHE/.cache/pip
+script:
+  - nosetests
+cache:
+  directories:
+    - $HOME/.cache/pip/
+deploy:
+  provider: pypi
+  user: daveshawley
+  password:
+    secure: O/YLldwSqNqanRsyv8ugET1cWlZ+cZ1L756KfYLq355fuUnUD2CJZHjdHTwgQS1rVIaYesboJn2XiJBfPSHLTg2JkALFjGLFEf2eBl4lmEBZbm9Wja3H4zxY174x4KMgMi5eHfHK5WfGknC9LJrUSySZOuTkNwns+638ijvGXzM=
+  distributions: sdist bdist_wheel
+  on:
+    tags: true
+    all_branches: true
+    python: 2.7

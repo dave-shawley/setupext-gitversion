@@ -99,7 +99,7 @@ Ok... Where?
 +---------------+--------------------------------------------------------------+
 | Source        | https://github.com/dave-shawley/setupext-gitversion          |
 +---------------+--------------------------------------------------------------+
-| Status        | https://drone.io/github.com/dave-shawley/setupext-gitversion |
+| Status        | https://travis-ci.org/dave-shawley/setupext-gitversion       |
 +---------------+--------------------------------------------------------------+
 | Download      | https://pypi.python.org/pypi/setupext-gitversion             |
 +---------------+--------------------------------------------------------------+
@@ -118,7 +118,7 @@ Ok... Where?
    :target: https://badge.fury.io/
 .. |Downloads| image:: https://pypip.in/d/setupext-gitversion/badge.svg?
    :target: https://pypi.python.org/pypi/setupext-gitversion
-.. |Status| image:: https://drone.io/github.com/dave-shawley/setupext-gitversion/status.png
-   :target: https://drone.io/github.com/dave-shawley/setupext-gitversion
+.. |Status| image:: https://travis-ci.org/dave-shawley/setupext-gitversion.svg
+   :target: https://travis-ci.org/dave-shawley/setupext-gitversion
 .. |License| image:: https://pypip.in/license/dave-shawley/badge.svg?
-   :target: https://setupext-dave-shawley.readthedocs.org/
+   :target: https://setupext-gitversion.readthedocs.org/
