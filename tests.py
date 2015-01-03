@@ -183,3 +183,22 @@ class WhenGeneratingVersionFileFromReleaseVersion(CommandTestCase):
     def test_that_version_file_is_empty(self):
         with open(self.version_file) as version_file:
             self.assertEqual(version_file.readlines(), [])
+
+
+class WhenRunningInDryRunMode(CommandTestCase):
+
+    @classmethod
+    def configure(cls, git_cmd):
+        cls.version_file = tempfile.mktemp()
+
+    @classmethod
+    def execute(cls, command):
+        command.version_file = cls.version_file
+        command._dry_run = True
+        command.run()
+
+    def test_that_command_is_not_run(self):
+        self.assertEqual(list(self.run_git_command.calls), [])
+
+    def test_that_version_file_is_not_created(self):
+        self.assertFalse(os.path.exists(self.version_file))
