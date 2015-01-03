@@ -5,7 +5,7 @@ import subprocess
 # get __version__ without having packaging installed
 try:
     import packaging.version
-except ImportError:
+except ImportError:  # pragma no cover
     pass
 
 
@@ -22,7 +22,7 @@ class GitVersion(cmd.Command):
     def initialize_options(self):
         self.version_file = None
 
-    def finalize_options(self):
+    def finalize_options(self):  # pragma: no cover
         pass
 
     def run(self):
@@ -71,7 +71,7 @@ class GitVersion(cmd.Command):
             self.debug('{0} {1}', 'git', ' '.join(args))
             return ['']
         stdout, stderr = _run_command('git', *args)
-        if stderr:
+        if stderr:  # pragma: no cover
             self.debug('{0} {1} produced output on stderr: {2}',
                        'git', ' '.join(args), stderr)
         return stdout.splitlines()
