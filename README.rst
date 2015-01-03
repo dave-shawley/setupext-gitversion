@@ -72,7 +72,7 @@ your distribution.
 4. Modify your *setup.py* to append the contents of *LOCAL-VERSION*
    to your ``version`` keyword:
 
-.. code-block:: python
+    .. code-block:: python
 
       version_suffix = ''
       try:
