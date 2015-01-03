@@ -114,13 +114,13 @@ Ok... Where?
 .. _Local Version Label: https://www.python.org/dev/peps/pep-0440/#local-version-identifiers
 .. _pkg_resources: https://pythonhosted.org/setuptools/pkg_resources.html#getting-or-creating-distributions
 
-.. |Version| image:: https://badge.fury.io/py/setupext-gitversion.svg
+.. |Version| image:: https://pypip.in/version/setupext-gitversion/badge.svg
    :target: https://pypi.python.org/pypi/setupext-gitversion
-.. |Downloads| image:: https://pypip.in/d/setupext-gitversion/badge.svg?
+.. |Downloads| image:: https://pypip.in/download/setupext-gitversion/badge.svg
    :target: https://pypi.python.org/pypi/setupext-gitversion
 .. |Status| image:: https://travis-ci.org/dave-shawley/setupext-gitversion.svg
    :target: https://travis-ci.org/dave-shawley/setupext-gitversion
-.. |License| image:: https://pypip.in/license/dave-shawley/badge.svg?
+.. |License| image:: https://pypip.in/license/setupext-gitversion/badge.svg
    :target: http://opensource.org/licenses/BSD-3-Clause
 .. |Docs| image:: https://readthedocs.org/projects/setupext-gitversion/badge/?version=latest
    :target: https://setupext-gitversion.readthedocs.org/
