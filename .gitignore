@@ -2,6 +2,7 @@ build/
 dist/
 env/
 __pycache__/
+LOCAL-VERSION
 
 .coverage
 *.pyc

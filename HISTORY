@@ -1,6 +1,7 @@
 Changelog
 =========
 
-* Next Release
+* Initial Release
 
-  - Create something amazing
+  - Update metadata version based on tag and git repo state.
+  - Write local version to file when `--version-file` is specified.

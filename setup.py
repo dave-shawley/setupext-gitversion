@@ -6,11 +6,24 @@ import sys
 from setupext import gitversion
 
 
+local_id = ''
+try:
+    with open('LOCAL-VERSION', 'r') as version_file:
+        local_id = version_file.readline().strip()
+except IOError:
+    pass
+
 with codecs.open('README.rst', 'rb', encoding='utf-8') as file_obj:
     long_description = '\n' + file_obj.read()
 
 install_requirements = []
 test_requirements = []
+
+with open('requirements.txt', 'r') as file_obj:
+    install_requirements.extend(
+        line.strip() for line in file_obj
+        if not line.startswith('#')
+    )
 
 with open('test-requirements.txt', 'r') as file_obj:
     test_requirements.extend(
@@ -24,7 +37,7 @@ if sys.version_info < (3, ):
 
 setuptools.setup(
     name='setupext-gitversion',
-    version=gitversion.__version__,
+    version=gitversion.__version__ + local_id,
     author='Dave Shawley',
     author_email='daveshawley@gmail.com',
     url='http://github.com/dave-shawley/setupext-gitversion',
