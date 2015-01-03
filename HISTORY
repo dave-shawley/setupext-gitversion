@@ -1,9 +1,14 @@
 Changelog
 =========
 
+* `1.0.1`_ (3-Jan-2015)
+
+  - Switch from using drone.io to travis-ci.org
+
 * `1.0.0`_ (3-Jan-2015)
 
   - Update metadata version based on tag and git repo state.
   - Write local version to file when `--version-file` is specified.
 
 .. _1.0.0: https://github.com/dave-shawley/setupext-gitversion/compare/0.0.0...1.0.0
+.. _1.0.1: https://github.com/dave-shawley/setupext-gitversion/compare/1.0.0...1.0.1
