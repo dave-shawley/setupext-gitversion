@@ -209,6 +209,99 @@ class WhenRunningInDryRunMode(CommandTestCase):
         self.assertFalse(os.path.exists(self.version_file))
 
 
+class WhenGeneratingVersionWithCommittish(CommandTestCase):
+
+    @classmethod
+    def configure(cls, git_cmd):
+        git_cmd.add_return_value(
+            ('MERGEa4af84faf0f936aa5871580f8081e9d67c3', ''),
+            'git', 'rev-list', '--merges', '1.2.3...HEAD',
+        )
+        git_cmd.add_return_value(
+            ('NEWESTd1dd78fdd4657a582b44ef7a74c09cc0f3\n'
+             'OLDER0974fb425b92b2d434112ea95882dd2e3de\n'
+             'OLDESTe15ee113ea9757eecf8225e11e55e6caad\n',
+             ''),
+            'git', 'rev-list', '--first-parent',
+            'MERGEa4af84faf0f936aa5871580f8081e9d67c3...HEAD',
+        )
+
+    @classmethod
+    def execute(cls, command):
+        command.committish = True
+        command.run()
+
+    def test_that_version_includes_committish(self):
+        self.assertEqual(
+            self.distribution.metadata.version,
+            '1.2.3.post1.dev3+NEWESTd',
+        )
+
+
+class WhenGeneratingCommittishVersionWithoutMerges(CommandTestCase):
+
+    @classmethod
+    def configure(cls, git_cmd):
+        git_cmd.add_return_value(
+            ('', ''),
+            'git', 'rev-list', '--merges', '1.2.3...HEAD')
+        git_cmd.add_return_value(
+            ('21728a4af84faf0f936aa5871580f8081e9d67c3\n', ''),
+            'git', 'rev-list', '--first-parent', '1.2.3...HEAD')
+
+    @classmethod
+    def execute(cls, command):
+        command.committish = True
+        command.run()
+
+    def test_that_version_includes_committish(self):
+        self.assertEqual(
+            self.distribution.metadata.version, '1.2.3.dev1+21728a4')
+
+
+class WhenGeneratingCommittishVersionWithoutCommits(CommandTestCase):
+
+    @classmethod
+    def configure(cls, git_cmd):
+        git_cmd.add_return_value(
+            ('152da6d1dd78fdd4657a582b44ef7a74c09cc0f3\n', ''),
+            'git', 'rev-list', '--merges', '1.2.3...HEAD')
+        git_cmd.add_return_value(
+            ('', ''),
+            'git', 'rev-list', '--first-parent',
+            '152da6d1dd78fdd4657a582b44ef7a74c09cc0f3...HEAD')
+
+    @classmethod
+    def execute(cls, command):
+        command.committish = True
+        command.run()
+
+    def test_that_version_includes_committish(self):
+        self.assertEqual(
+            self.distribution.metadata.version, '1.2.3.post1+152da6d')
+
+
+class WhenGeneratingCommittishOnReleaseCommit(CommandTestCase):
+
+    @classmethod
+    def configure(cls, git_cmd):
+        git_cmd.add_return_value(
+            ('', ''),
+            'git', 'rev-list', '--merges', '1.2.3...HEAD')
+        git_cmd.add_return_value(
+            ('', ''),
+            'git', 'rev-list', '--first-parent',
+            '1.2.3...HEAD')
+
+    @classmethod
+    def execute(cls, command):
+        command.committish = True
+        command.run()
+
+    def test_that_version_does_not_include_committish(self):
+        self.assertEqual(self.distribution.metadata.version, '1.2.3')
+
+
 class _RunCommandTestCase(unittest.TestCase):
 
     @classmethod

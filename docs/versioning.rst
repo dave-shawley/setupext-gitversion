@@ -49,3 +49,10 @@ Development Release Segment
 ---------------------------
 This extension defines the development release segment as the number of
 commits since the last merge.
+
+Local Segment
+-------------
+This extension defines the local identifier as the first seven characters
+of the most recent commit.  The local identifier is only included if the
+``--committish`` flag is included and either the post or development 
+segment is defined.

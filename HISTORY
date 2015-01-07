@@ -1,6 +1,10 @@
 Changelog
 =========
 
+* Next Release
+
+  - Add `--committish` command line flag.
+
 * `1.0.1`_ (3-Jan-2015)
 
   - Switch from using drone.io to travis-ci.org
