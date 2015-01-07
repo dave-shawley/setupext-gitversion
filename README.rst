@@ -58,7 +58,9 @@ environment and then use it from the command line when you generate and upload
 your distribution.
 
 1. ``pip install setupext-gitversion`` into your build environment
-2. Add the following lines to your *setup.cfg*::
+2. Add the following lines to your *setup.cfg*:
+
+.. code-block:: ini
 
      [git_version]
      version-file = LOCAL-VERSION
@@ -68,7 +70,9 @@ your distribution.
       include LOCAL-VERSION
 
 4. Modify your *setup.py* to append the contents of *LOCAL-VERSION*
-   to your ``version`` keyword::
+   to your ``version`` keyword:
+
+    .. code-block:: python
 
       version_suffix = ''
       try:
