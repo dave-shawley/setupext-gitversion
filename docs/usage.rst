@@ -13,6 +13,11 @@ the metadata in-memory, this is only really useful in the same *setup.py*
 execution as a packaging command such as ``sdist`` or one of the ``bdist``
 variants.
 
+.. option:: -C, --committish
+
+   Include the abbreviated version of the most recent committish as
+   the local portion of the version number.
+
 .. option:: -V FILE, --version-file FILE
 
    Writes the local segment of the version to *FILE* in addition to

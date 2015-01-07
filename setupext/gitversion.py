@@ -16,11 +16,14 @@ __version__ = '.'.join(str(v) for v in version_info)
 class GitVersion(cmd.Command):
     description = 'Generate version numbers based on git'
     user_options = [
+        ('committish', 'c', 'append the committish to the local version'),
         ('version-file=', 'V', 'write the generated version to this file'),
     ]
+    boolean_options = ['committish']
 
     def initialize_options(self):
         self.version_file = None
+        self.committish = False
 
     def finalize_options(self):  # pragma: no cover
         pass
@@ -29,6 +32,7 @@ class GitVersion(cmd.Command):
         version = packaging.version.parse(self.distribution.metadata.version)
         public_version, _ = _partition_version(version.public.split('.'))
         starting_rev = public_version
+        last_commit = None
 
         local_version = []
         lines = self._run_git('rev-list', '--merges',
@@ -37,16 +41,20 @@ class GitVersion(cmd.Command):
         if lines:
             local_version.append('post{0}'.format(len(lines)))
             starting_rev = lines[0]
+            last_commit = lines[0]
 
         lines = self._run_git('rev-list', '--first-parent',
                               '{0}...HEAD'.format(starting_rev))
         self.debug('found {0} commits since {1}', len(lines), starting_rev)
         if lines:
             local_version.append('dev{0}'.format(len(lines)))
+            last_commit = lines[0]
 
         full_version = public_version
         if local_version:
             local_version = '.'.join(local_version)
+            if self.committish:
+                local_version += '+{0}'.format(last_commit[:7])
             full_version += '.{0}'.format(local_version)
         self.info('setting version to {0}', full_version)
         self.distribution.metadata.version = full_version
