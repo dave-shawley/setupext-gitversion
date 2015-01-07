@@ -1,7 +1,7 @@
 Changelog
 =========
 
-* Next Release
+* `1.1.0`_ (6-Jan-2015)
 
   - Add `--committish` command line flag.
 
@@ -16,3 +16,4 @@ Changelog
 
 .. _1.0.0: https://github.com/dave-shawley/setupext-gitversion/compare/0.0.0...1.0.0
 .. _1.0.1: https://github.com/dave-shawley/setupext-gitversion/compare/1.0.0...1.0.1
+.. _1.1.0: https://github.com/dave-shawley/setupext-gitversion/compare/1.0.1...1.1.0
