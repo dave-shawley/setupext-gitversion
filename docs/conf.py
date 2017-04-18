@@ -7,7 +7,7 @@ from setupext import gitversion
 
 
 project = 'Setupext: gitversion'
-copyright = '2014, Dave Shawley'
+copyright = '2014-2017, Dave Shawley'
 version = gitversion.__version__
 release = gitversion.__version__
 
