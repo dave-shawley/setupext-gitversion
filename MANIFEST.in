@@ -4,9 +4,9 @@ include LICENSE
 include LOCAL-VERSION
 include .coveragerc
 include *requirements.txt
+include tests.py
 include tox.ini
-graft doc
-graft tests
+graft docs
 
 global-exclude __pycache__
 global-exclude *.pyc
